@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom'
 import getaway from '../assets/logo/getaway.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import { faLightbulb, faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
 
 function Header() {
      const [show, setShow] = useState(false);
