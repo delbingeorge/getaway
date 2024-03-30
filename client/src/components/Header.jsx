@@ -6,8 +6,10 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 function Header() {
      const [show, setShow] = useState(false);
+     const navigate = useLocation();
+     let pathname = navigate.pathname;
      return (
-          <div className='px-4 py-2 flex items-center justify-between font-inter border-b-2 shadow-md'>
+          <div className={`${pathname == '/sign-up' ? 'hidden' : 'px-4 py-2 flex items-center justify-between font-inter border-b-2 shadow-md'}`}>
                <Link to='/' className='lg:w-[20%] w-full'>
                     <img className='h-12 lg:h-14' src={getaway} alt="Getaway Logo" />
                </Link>
@@ -34,7 +36,7 @@ function Header() {
                                    </defs>
                               </svg>
                          </button>
-                         <Link to='/sign-in' class="text-white bg-[#050708]  hover:bg-[#050708]/90  font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                         <Link to='/sign-up' class="text-white bg-[#050708]  hover:bg-[#050708]/90  font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                               Sign Up
                          </Link>
                     </div>
