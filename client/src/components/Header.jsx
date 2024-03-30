@@ -9,7 +9,7 @@ function Header() {
      const navigate = useLocation();
      let pathname = navigate.pathname;
      return (
-          <div className={`${pathname == '/sign-up' ? 'hidden' : 'px-4 py-2 flex items-center justify-between font-inter border-b-2 shadow-md'}`}>
+          <div className={`${pathname == '/sign-up' || pathname == '/sign-in' ? 'hidden' : 'px-4 py-2 flex items-center justify-between font-inter border-b-2 shadow-md'}`}>
                <Link to='/' className='lg:w-[20%] w-full'>
                     <img className='h-12 lg:h-14' src={getaway} alt="Getaway Logo" />
                </Link>
