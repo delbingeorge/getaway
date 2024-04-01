@@ -6,9 +6,41 @@ import { Link } from 'react-router-dom'
 
 function SignUp() {
      const [show, setShow] = useState(false);
+     const [errorMessage, setErrorMessage] = useState(null)
+     const [loading, setLoading] = useState(false)
 
      const handleSwipe = () => {
           console.log("done")
+     }
+
+     const [formData, setFormData] = useState({});
+
+     const handleChange = (e) => {
+          setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
+     }
+
+     const formOnSubmit = async (e) => {
+          e.preventDefault();
+          if (!formData.username || !formData.email || !formData.password) {
+               return setErrorMessage("All fields are required!");
+          }
+          try {
+               setLoading(true);
+               setErrorMessage(null);
+               const res = await fetch('/api/auth/sign-up', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+               })
+               const data = await res.json();
+               if (data.success === false) {
+                    return setErrorMessage("Details already exists!");
+               }
+               setLoading(false)
+          } catch (error) {
+               setErrorMessage("Something went wrong!")
+               setLoading(false)
+          }
      }
 
      return (
@@ -16,26 +48,26 @@ function SignUp() {
                <div className="w-full lg:w-2/4 min-h-screen relative hidden lg:flex items-end justify-start overflow-hidden">
                     <div>
                          <div className="left-0 top-0 h-full w-full bg-gradient-to-t from-black/40 via-black/10 to-transparent absolute z-10">
-                              {/* <div className='space-x-3 flex flex-row  absolute bottom-5 right-10'>
-                                   <div onClick={() => { handleSwipe }} className='cursor-pointer'>
+                              <div className='space-x-3 flex flex-row  absolute bottom-5 right-10'>
+                                   <div onClick={() => { handleSwipe }} className='cursor-pointer duration-200 hover:scale-90'>
                                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                              <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="1.5" />
                                              <path d="M16 12H8M8 12L11 9M8 12L11 15" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
                                         </svg>
                                    </div>
-                                   <div onClick={() => { console.log("done") }} className='cursor-pointer'>
+                                   <div onClick={() => { console.log("done") }} className='cursor-pointer duration-200 hover:scale-90'>
                                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                              <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="1.5" />
                                              <path d="M8 12C12.6863 12 11.3137 12 16 12M16 12L13 9M16 12L13 15" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
                                         </svg>
                                    </div>
-                              </div> */}
+                              </div>
                          </div>
                          <img id="zoomImage" src={bgImage} className="w-full top-0 left-0 h-full object-cover absolute -z-20" alt="" />
                     </div>
                </div>
                <div className="min-h-screen flex-col w-full lg:w-2/4 flex items-center justify-center">
-                    <form id="login-screen" className="flex items-center flex-col w-[95%] lg:w-full justify-center space-y-6"
+                    <form id="login-screen" onSubmit={formOnSubmit} className="flex items-center flex-col w-[95%] lg:w-full justify-center space-y-6"
                          method="post">
                          <div className="flex flex-row items-center justify-center mt-1">
                               <img src={getawaySpin} id="zoomLogo" className="w-20 animate-spinner" alt="" />
@@ -53,7 +85,7 @@ function SignUp() {
                                         Username
                                    </span>
                               </label>
-                              <input type="email" name="email" className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+                              <input type="text" id="username" onChange={handleChange} className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0"
                                    placeholder="getaway_user" />
                          </div>
                          <div className="flex flex-col w-[85%] lg:w-3/4">
@@ -63,7 +95,7 @@ function SignUp() {
                                         Email address
                                    </span>
                               </label>
-                              <input type="email" name="email" className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+                              <input type="email" id="email" onChange={handleChange} className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0"
                                    placeholder="yourname@example.com" />
                          </div>
                          <div className="flex flex-col w-[85%] lg:w-3/4">
@@ -78,7 +110,7 @@ function SignUp() {
                                    </span>
                               </label>
                               <div className='relative'>
-                                   <input type={show == true ? 'text' : 'password'} name="password" className="w-full text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+                                   <input type={show == true ? 'text' : 'password'} id="password" onChange={handleChange} className="w-full text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0"
                                         placeholder="*****************" />
                                    <div onClick={() => { setShow(!show) }} className='absolute right-0 top-4'>
                                         {show == false ?
@@ -93,7 +125,7 @@ function SignUp() {
                                    </div>
                               </div>
                          </div>
-                         <div className="flex flex-col w-[85%] lg:w-3/4">
+                         {/* <div className="flex flex-col w-[85%] lg:w-3/4">
                               <label for="password" className="text-[1rem] text-dark/70  flex items-center space-x-1 animate-shakes">
                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24">
                                         <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
@@ -104,12 +136,29 @@ function SignUp() {
                                         Re-type password
                                    </span>
                               </label>
-                              <input type="password" name="password" className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+                              <input type="password" id="re-password" onChange={handleChange} className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" 
                                    placeholder="*****************" />
-                         </div>
-                         <input type="submit"
-                              className="text-[1.35rem] bg-primary w-[85%] lg:w-3/4 text-light py-4 px-24 hover:bg-primary/90 cursor-pointer duration-300 font-medium"
-                              value="Create account" />
+                         </div> */}
+                         {errorMessage && (
+                              <div className='flex items-center justify-center space-x-2'>
+                                   <svg viewBox="0 0 24 24" fill="none" className='w-6 h-6' xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 12C19.5 16.1421 16.1421 19.5 12 19.5C7.85786 19.5 4.5 16.1421 4.5 12C4.5 7.85786 7.85786 4.5 12 4.5C16.1421 4.5 19.5 7.85786 19.5 12ZM21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12ZM11.25 13.5V8.25H12.75V13.5H11.25ZM11.25 15.75V14.25H12.75V15.75H11.25Z" fill="#ff0000"></path> </g></svg>
+                                   <span className='text-red-500 font-medium'>{errorMessage}</span>
+                              </div>
+                         )}
+                         <button type="submit" disabled={loading} className="text-[1.35rem] bg-primary flex items-center justify-center w-[85%] lg:w-3/4 text-light py-4 px-24 hover:bg-primary/90 cursor-pointer duration-300 font-medium">
+                              {loading ? <>
+                                   <svg className='w-6 h-6' viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" class="hds-flight-icon--animation-loading">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier"> <g fill="#fff" fill-rule="evenodd" clip-rule="evenodd">
+                                             <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" opacity=".2"></path>
+                                             <path d="M7.25.75A.75.75 0 018 0a8 8 0 018 8 .75.75 0 01-1.5 0A6.5 6.5 0 008 1.5a.75.75 0 01-.75-.75z"></path>
+                                        </g>
+                                        </g>
+                                   </svg>
+                                   {/* <span>Loading</span> */}
+                              </> : 'Create account'}
+                         </button>
                          <h1 className='font-inter font-semibold'>OR</h1>
                          <button className="space-x-3 flex items-center justify-center text-[1.35rem] bg-white border-[3px] border-black w-[85%] lg:w-3/4 text-light py-3 px-8 lg:px-24 hover:bg-primary/20 cursor-pointer duration-300 font-medium">
                               <svg className='w-6 h-6' viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
