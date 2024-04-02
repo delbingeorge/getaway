@@ -1,45 +1,79 @@
 import React, { useState } from 'react'
-import getawayText from '../assets/logo/getawayTextSignIn.png'
+import getawayText from '../assets/logo/getawayText.png'
 import getawaySpin from '../assets/logo/getawaySpin.png'
 import bgImage from '../assets/images/bgcoral.png'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function SignIn() {
   const [show, setShow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSwipe = () => {
+    console.log("done")
+  }
+
   const [formData, setFormData] = useState({});
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value })
+    setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
   }
-
 
   const formOnSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.username || !formData.password) {
+      return setErrorMessage("All fields are required!");
+    }
     try {
-      const res = await fetch('/api/auth/sign-up', {
+      setLoading(true);
+      setErrorMessage(null);
+      const res = await fetch('/api/auth/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
+      const data = await res.json();
+      if (data.success === false) {
+        return setErrorMessage("Details already exists!");
+      }
+      setLoading(false)
+      if (res.ok) {
+        navigate('/')
+      }
     } catch (error) {
-      console.log(error)
+      setErrorMessage("Something went wrong!")
+      setLoading(false)
     }
   }
 
-
   return (
     <div className="flex lg:flex-row flex-col font-poppins">
-      <div className="w-full lg:w-2/4 hidden min-h-screen relative lg:flex items-end justify-start overflow-hidden">
+      <div className="w-full lg:w-2/4 min-h-screen relative hidden lg:flex items-end justify-start overflow-hidden">
         <div>
-          <div className="left-0 top-0 h-full w-full bg-gradient-to-t from-black/40 via-black/10 to-transparent absolute -z-10">
+          <div className="left-0 top-0 h-full w-full bg-gradient-to-t from-black/40 via-black/10 to-transparent absolute z-10">
+            <div className='space-x-3 flex flex-row  absolute bottom-5 right-10'>
+              <div onClick={() => { handleSwipe }} className='cursor-pointer duration-200 hover:scale-90'>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="1.5" />
+                  <path d="M16 12H8M8 12L11 9M8 12L11 15" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div onClick={() => { console.log("done") }} className='cursor-pointer duration-200 hover:scale-90'>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="#fff" strokeWidth="1.5" />
+                  <path d="M8 12C12.6863 12 11.3137 12 16 12M16 12L13 9M16 12L13 15" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+            </div>
           </div>
           <img id="zoomImage" src={bgImage} className="w-full top-0 left-0 h-full object-cover absolute -z-20" alt="" />
         </div>
       </div>
       <div className="min-h-screen flex-col w-full lg:w-2/4 flex items-center justify-center">
-        <form onSubmit={formOnSubmit} id="login-screen" className="flex items-center flex-col w-[95%] lg:w-full justify-center space-y-6"
+        <form id="login-screen" onSubmit={formOnSubmit} className="flex items-center flex-col w-[95%] lg:w-full justify-center space-y-6"
           method="post">
-          <div className="flex flex-row items-center justify-center">
+          <div className="flex flex-row items-center justify-center mt-1">
             <img src={getawaySpin} id="zoomLogo" className="w-20 animate-spinner" alt="" />
             <img src={getawayText} id="zoomLogo" className="w-44" alt="" />
           </div>
@@ -55,7 +89,7 @@ function SignIn() {
                 Username
               </span>
             </label>
-            <input type="text" name="username" className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+            <input type="text" id="username" onChange={handleChange} className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0"
               placeholder="getaway_user" />
           </div>
           <div className="flex flex-col w-[85%] lg:w-3/4">
@@ -70,7 +104,7 @@ function SignIn() {
               </span>
             </label>
             <div className='relative'>
-              <input type={show == true ? 'text' : 'password'} name="password" className="w-full text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" required
+              <input type={show == true ? 'text' : 'password'} id="password" onChange={handleChange} className="w-full text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0"
                 placeholder="*****************" />
               <div onClick={() => { setShow(!show) }} className='absolute right-0 top-4'>
                 {show == false ?
@@ -85,25 +119,38 @@ function SignIn() {
               </div>
             </div>
           </div>
-          <input type="submit"
-            className="text-[1.35rem] bg-primary w-[85%] lg:w-3/4 text-light py-4 px-24 hover:bg-primary/90 cursor-pointer duration-300 font-medium"
-            value="Login" />
-          <h1 className='font-inter font-semibold'>OR</h1>
-          <button className="space-x-3 flex items-center justify-center text-[1.35rem] bg-white border-[3px] border-black w-[85%] lg:w-3/4 text-light py-3 px-8 lg:px-24 hover:bg-primary/20 cursor-pointer duration-300 font-medium">
-            <svg className='w-6 h-6' viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g clipPath="url(#clip0_17_40)">
-                <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4" />
-                <path d="M24.48 48.0016C30.9529 48.0016 36.4116 45.8764 40.3888 42.2078L32.6549 36.2111C30.5031 37.675 27.7252 38.5039 24.4888 38.5039C18.2275 38.5039 12.9187 34.2798 11.0139 28.6006H3.03296V34.7825C7.10718 42.8868 15.4056 48.0016 24.48 48.0016Z" fill="#34A853" />
-                <path d="M11.0051 28.6006C9.99973 25.6199 9.99973 22.3922 11.0051 19.4115V13.2296H3.03298C-0.371021 20.0112 -0.371021 28.0009 3.03298 34.7825L11.0051 28.6006Z" fill="#FBBC04" />
-                <path d="M24.48 9.49932C27.9016 9.44641 31.2086 10.7339 33.6866 13.0973L40.5387 6.24523C36.2 2.17101 30.4414 -0.068932 24.48 0.00161733C15.4055 0.00161733 7.10718 5.11644 3.03296 13.2296L11.005 19.4115C12.901 13.7235 18.2187 9.49932 24.48 9.49932Z" fill="#EA4335" />
-              </g>
-              <defs>
-                <clipPath id="clip0_17_40">
-                  <rect width="48" height="48" fill="white" />
-                </clipPath>
-              </defs>
-            </svg>
-            <h1 className='text-black text-xl  font-medium'>Sign up with Google</h1>
+          {/* <div className="flex flex-col w-[85%] lg:w-3/4">
+                              <label for="password" className="text-[1rem] text-dark/70  flex items-center space-x-1 animate-shakes">
+                                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24">
+                                        <path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
+                                             strokeWidth="1.5"
+                                             d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25" />
+                                   </svg>
+                                   <span>
+                                        Re-type password
+                                   </span>
+                              </label>
+                              <input type="password" id="re-password" onChange={handleChange} className="text-[1.3rem] placeholder:text-dark/70 text-dark border-b-[3px] border-b-primary outline-none pb-1 pt-3 focus:placeholder:opacity-0" 
+                                   placeholder="*****************" />
+                         </div> */}
+          {errorMessage && (
+            <div className='flex items-center justify-center space-x-2'>
+              <svg viewBox="0 0 24 24" fill="none" className='w-6 h-6' xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.00024000000000000003"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 12C19.5 16.1421 16.1421 19.5 12 19.5C7.85786 19.5 4.5 16.1421 4.5 12C4.5 7.85786 7.85786 4.5 12 4.5C16.1421 4.5 19.5 7.85786 19.5 12ZM21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12ZM11.25 13.5V8.25H12.75V13.5H11.25ZM11.25 15.75V14.25H12.75V15.75H11.25Z" fill="#ff0000"></path> </g></svg>
+              <span className='text-red-500 font-medium'>{errorMessage}</span>
+            </div>
+          )}
+          <button type="submit" disabled={loading} className="text-[1.35rem] bg-primary flex items-center justify-center w-[85%] lg:w-3/4 text-light py-4 px-24 hover:bg-primary/90 cursor-pointer duration-300 font-medium">
+            {loading ?
+              <svg className='w-6 h-6 animate-spin' viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier"> <g fill="#fff" fill-rule="evenodd" clip-rule="evenodd">
+                  <path d="M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z" opacity=".2"></path>
+                  <path d="M7.25.75A.75.75 0 018 0a8 8 0 018 8 .75.75 0 01-1.5 0A6.5 6.5 0 008 1.5a.75.75 0 01-.75-.75z"></path>
+                </g>
+                </g>
+              </svg>
+              : 'Login'}
           </button>
         </form>
         <Link className='font-semibold mt-4' to='/sign-up'>Not a reader?

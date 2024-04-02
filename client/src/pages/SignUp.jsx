@@ -2,12 +2,13 @@ import React, { useState } from 'react'
 import getawayText from '../assets/logo/getawayText.png'
 import getawaySpin from '../assets/logo/getawaySpin.png'
 import bgImage from '../assets/images/bgcoral.png'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function SignUp() {
      const [show, setShow] = useState(false);
      const [errorMessage, setErrorMessage] = useState(null)
      const [loading, setLoading] = useState(false)
+     const navigate = useNavigate()
 
      const handleSwipe = () => {
           console.log("done")
@@ -37,6 +38,9 @@ function SignUp() {
                     return setErrorMessage("Details already exists!");
                }
                setLoading(false)
+               if (res.ok) {
+                    navigate('/sign-in')
+               }
           } catch (error) {
                setErrorMessage("Something went wrong!")
                setLoading(false)
