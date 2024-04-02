@@ -146,8 +146,8 @@ function SignUp() {
                               </div>
                          )}
                          <button type="submit" disabled={loading} className="text-[1.35rem] bg-primary flex items-center justify-center w-[85%] lg:w-3/4 text-light py-4 px-24 hover:bg-primary/90 cursor-pointer duration-300 font-medium">
-                              {loading ? <>
-                                   <svg className='w-6 h-6' viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" class="hds-flight-icon--animation-loading">
+                              {loading ?
+                                   <svg className='w-6 h-6 animate-spin' viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                         <g id="SVGRepo_iconCarrier"> <g fill="#fff" fill-rule="evenodd" clip-rule="evenodd">
@@ -156,8 +156,7 @@ function SignUp() {
                                         </g>
                                         </g>
                                    </svg>
-                                   {/* <span>Loading</span> */}
-                              </> : 'Create account'}
+                                   : 'Create account'}
                          </button>
                          <h1 className='font-inter font-semibold'>OR</h1>
                          <button className="space-x-3 flex items-center justify-center text-[1.35rem] bg-white border-[3px] border-black w-[85%] lg:w-3/4 text-light py-3 px-8 lg:px-24 hover:bg-primary/20 cursor-pointer duration-300 font-medium">
