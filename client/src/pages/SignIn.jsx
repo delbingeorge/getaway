@@ -3,18 +3,20 @@ import getawayText from '../assets/logo/getawayText.png'
 import getawaySpin from '../assets/logo/getawaySpin.png'
 import bgImage from '../assets/images/bgcoral.png'
 import { Link, useNavigate } from 'react-router-dom'
+import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
 function SignIn() {
   const [show, setShow] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
   const navigate = useNavigate()
+  const { loading, error: errorMessage } = useSelector(state => state.user)
 
   const handleSwipe = () => {
     console.log("done")
   }
 
-  const [formData, setFormData] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
@@ -23,11 +25,10 @@ function SignIn() {
   const formOnSubmit = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
-      return setErrorMessage("All fields are required!");
+      return dispatch(signInFailure("Please fill all the fields! "))
     }
     try {
-      setLoading(true);
-      setErrorMessage(null);
+      dispatch(signInStart())
       const res = await fetch('/api/auth/sign-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -35,15 +36,14 @@ function SignIn() {
       })
       const data = await res.json();
       if (data.success === false) {
-        return setErrorMessage("Details already exists!");
+        dispatch(signInFailure(data.message))
       }
-      setLoading(false)
       if (res.ok) {
+        dispatch(signInSuccess(data))
         navigate('/')
       }
     } catch (error) {
-      setErrorMessage("Something went wrong!")
-      setLoading(false)
+      dispatch(signInFailure(error.message))
     }
   }
 
