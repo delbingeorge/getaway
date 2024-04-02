@@ -5,6 +5,7 @@ import bgImage from '../assets/images/bgcoral.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import OAuth from '../components/OAuth'
 
 function SignIn() {
   const [show, setShow] = useState(false);
@@ -16,7 +17,6 @@ function SignIn() {
   const handleSwipe = () => {
     console.log("done")
   }
-
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
@@ -153,6 +153,8 @@ function SignIn() {
               : 'Login'}
           </button>
         </form>
+        <h1 className='font-inter my-4 font-semibold'>OR</h1>
+        <OAuth />
         <Link className='font-semibold mt-4' to='/sign-up'>Not a reader?
           <span className='underline pl-2'>
             create an account

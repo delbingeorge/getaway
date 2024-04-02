@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema(
             unique: true,
         },
         password: { type: String, required: true },
+        profilePicture: {
+            type: String,
+            default:
+                "https://img.freepik.com/premium-vector/female-user-profile-avatar-is-woman-character-screen-saver-with-emotions_505620-617.jpg",
+        },
     },
     { timestamps: true }
 );
