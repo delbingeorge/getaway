@@ -86,6 +86,8 @@ export const google = async (req, res, next) => {
                     httpOnly: true,
                 })
                 .json(rest);
+
+            console.log(token);
         }
     } catch (error) {
         next(error);
